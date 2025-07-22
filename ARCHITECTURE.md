@@ -2,7 +2,7 @@
 
 ## Original Prompt
 
-> Implement a cross platform tool in Go which can update operating system and application trusts stores (ca bundles etc) with recommended new root certificates. It should target linux, macos and windows and use configuration to decide which target applicaiton stores or OS stores to update. Save this prompt as part of the architecture summary.
+> Implement a cross platform tool in Go which can update operating system and application trusts stores (ca bundles etc) with recommended new root certificates. It should target linux, macos and windows and use configuration to decide which target application stores or OS stores to update.
 
 ## Architecture Overview
 
