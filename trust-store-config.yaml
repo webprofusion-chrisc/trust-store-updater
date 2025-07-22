@@ -1,0 +1,67 @@
+# Trust Store Updater Configuration
+# This file defines certificate sources and target trust stores to update
+
+# Certificate sources - where to fetch new root certificates from
+certificate_sources:
+  - name: "mozilla-ca-bundle"
+    type: "url"
+    source: "https://curl.se/ca/cacert.pem"
+    enabled: true
+    verify_tls: true
+    filters: []
+
+  - name: "local-certificates"
+    type: "directory"
+    source: "./certificates"
+    enabled: false
+    filters:
+      - "*.crt"
+      - "*.pem"
+
+# Trust stores - target stores to update with new certificates
+trust_stores:
+  # System trust stores
+  - name: "system-ca-certificates"
+    type: "system"
+    platform: ["linux"]
+    target: "ca-certificates"
+    enabled: true
+    require_root: true
+
+  - name: "system-keychain"
+    type: "system"
+    platform: ["darwin"]
+    target: "system-keychain"
+    enabled: true
+    require_root: true
+
+  - name: "system-cert-store"
+    type: "system"
+    platform: ["windows"]
+    target: "root"
+    enabled: true
+    require_root: true
+
+  # Application trust stores
+  - name: "docker-ca-certificates"
+    type: "application"
+    platform: ["linux", "darwin", "windows"]
+    target: "docker"
+    enabled: false
+    require_root: false
+
+  - name: "java-cacerts"
+    type: "application"
+    platform: ["linux", "darwin", "windows"]
+    target: "java-cacerts"
+    enabled: false
+    require_root: false
+
+# Global settings
+settings:
+  backup_enabled: true
+  backup_directory: "./backups"
+  log_level: "info"
+  max_retries: 3
+  timeout_seconds: 30
+  validate_after: true
