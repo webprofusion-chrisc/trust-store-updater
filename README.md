@@ -2,6 +2,8 @@
 
 A cross-platform tool written in Go for updating operating system and application trust stores with new root certificates.
 
+Note: this tool is a prototype and not yet suitable for production use.
+
 ## Features
 
 - **Cross-platform support**: Linux, macOS, and Windows
