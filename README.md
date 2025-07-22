@@ -2,7 +2,7 @@
 
 A cross-platform tool written in Go for updating operating system and application trust stores with new root certificates.
 
-Note: this tool is a prototype and not yet suitable for production use.
+Note: this tool is a prototype and not yet suitable for production use. As Uncle Ben/Voltaire would say, with great power comes great responsibility (yours).
 
 ## Features
 
