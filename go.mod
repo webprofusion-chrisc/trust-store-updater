@@ -1,4 +1,4 @@
-module github.com/trust-store-updater
+module github.com/webprofusion/trust-store-updater
 
 go 1.21
 

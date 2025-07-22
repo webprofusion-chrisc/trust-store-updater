@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/trust-store-updater/internal/config"
-	"github.com/trust-store-updater/internal/updater"
+	"github.com/webprofusion/trust-store-updater/internal/config"
+	"github.com/webprofusion/trust-store-updater/internal/updater"
 )
 
 var (

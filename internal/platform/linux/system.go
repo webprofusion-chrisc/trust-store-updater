@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/trust-store-updater/internal/certstore"
+	"github.com/webprofusion/trust-store-updater/internal/certstore"
 )
 
 // SystemStore implements certificate store operations for Linux system stores
@@ -60,7 +60,7 @@ func (s *SystemStore) RequiresRoot() bool {
 // ListCertificates returns all certificates currently in the store
 func (s *SystemStore) ListCertificates() ([]*x509.Certificate, error) {
 	var certs []*x509.Certificate
-	
+
 	switch s.target {
 	case "ca-certificates":
 		return s.listCaCertificates()
@@ -124,12 +124,12 @@ func (s *SystemStore) Validate() error {
 	if !s.IsSupported() {
 		return fmt.Errorf("store is not supported on this system")
 	}
-	
+
 	// Check if we have required permissions
 	if s.RequiresRoot() && os.Geteuid() != 0 {
 		return fmt.Errorf("root privileges required for system store operations")
 	}
-	
+
 	return nil
 }
 
@@ -173,27 +173,27 @@ func (s *SystemStore) addCaCertificate(cert *x509.Certificate) error {
 	if err := os.MkdirAll(certDir, 0755); err != nil {
 		return fmt.Errorf("failed to create certificate directory: %w", err)
 	}
-	
+
 	// Generate a filename based on certificate subject
 	filename := generateCertFilename(cert) + ".crt"
 	certPath := filepath.Join(certDir, filename)
-	
+
 	// Write certificate to file
 	if err := writeCertificateToFile(cert, certPath); err != nil {
 		return fmt.Errorf("failed to write certificate: %w", err)
 	}
-	
+
 	// Update ca-certificates
 	cmd := exec.Command("update-ca-certificates")
 	if s.verbose {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
-	
+
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to update ca-certificates: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -203,27 +203,27 @@ func (s *SystemStore) addUpdateCaTrustCertificate(cert *x509.Certificate) error 
 	if err := os.MkdirAll(certDir, 0755); err != nil {
 		return fmt.Errorf("failed to create certificate directory: %w", err)
 	}
-	
+
 	// Generate a filename based on certificate subject
 	filename := generateCertFilename(cert) + ".crt"
 	certPath := filepath.Join(certDir, filename)
-	
+
 	// Write certificate to file
 	if err := writeCertificateToFile(cert, certPath); err != nil {
 		return fmt.Errorf("failed to write certificate: %w", err)
 	}
-	
+
 	// Update ca-trust
 	cmd := exec.Command("update-ca-trust", "extract")
 	if s.verbose {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
-	
+
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to update ca-trust: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -231,18 +231,18 @@ func (s *SystemStore) removeCaCertificate(cert *x509.Certificate) error {
 	// Remove certificate from /usr/local/share/ca-certificates/
 	filename := generateCertFilename(cert) + ".crt"
 	certPath := filepath.Join("/usr/local/share/ca-certificates/", filename)
-	
+
 	if err := os.Remove(certPath); err != nil {
 		return fmt.Errorf("failed to remove certificate: %w", err)
 	}
-	
+
 	// Update ca-certificates
 	cmd := exec.Command("update-ca-certificates")
 	if s.verbose {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
-	
+
 	return cmd.Run()
 }
 
@@ -250,18 +250,18 @@ func (s *SystemStore) removeUpdateCaTrustCertificate(cert *x509.Certificate) err
 	// Remove certificate from /etc/pki/ca-trust/source/anchors/
 	filename := generateCertFilename(cert) + ".crt"
 	certPath := filepath.Join("/etc/pki/ca-trust/source/anchors/", filename)
-	
+
 	if err := os.Remove(certPath); err != nil {
 		return fmt.Errorf("failed to remove certificate: %w", err)
 	}
-	
+
 	// Update ca-trust
 	cmd := exec.Command("update-ca-trust", "extract")
 	if s.verbose {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
-	
+
 	return cmd.Run()
 }
 
@@ -283,7 +283,7 @@ func (s *SystemStore) restoreCaCertificates(backupPath string) error {
 	if err := cmd.Run(); err != nil {
 		return err
 	}
-	
+
 	// Update ca-certificates
 	cmd = exec.Command("update-ca-certificates")
 	return cmd.Run()
@@ -295,7 +295,7 @@ func (s *SystemStore) restoreUpdateCaTrust(backupPath string) error {
 	if err := cmd.Run(); err != nil {
 		return err
 	}
-	
+
 	// Update ca-trust
 	cmd = exec.Command("update-ca-trust", "extract")
 	return cmd.Run()
@@ -309,13 +309,13 @@ func generateCertFilename(cert *x509.Certificate) string {
 	if subject == "" {
 		subject = fmt.Sprintf("cert_%x", cert.SerialNumber)
 	}
-	
+
 	// Replace unsafe characters
 	filename := strings.ReplaceAll(subject, " ", "_")
 	filename = strings.ReplaceAll(filename, "/", "_")
 	filename = strings.ReplaceAll(filename, "\\", "_")
 	filename = strings.ReplaceAll(filename, "*", "_")
-	
+
 	return filename
 }
 
@@ -323,7 +323,7 @@ func writeCertificateToFile(cert *x509.Certificate, path string) error {
 	// Convert certificate to PEM format
 	certPEM := fmt.Sprintf("-----BEGIN CERTIFICATE-----\n%s-----END CERTIFICATE-----\n",
 		base64.StdEncoding.EncodeToString(cert.Raw))
-	
+
 	// Write to file
 	return os.WriteFile(path, []byte(certPEM), 0644)
 }
@@ -331,14 +331,14 @@ func writeCertificateToFile(cert *x509.Certificate, path string) error {
 // SupportedStores returns the list of supported stores for Linux
 func SupportedStores() []string {
 	var stores []string
-	
+
 	if _, err := exec.LookPath("update-ca-certificates"); err == nil {
 		stores = append(stores, "ca-certificates")
 	}
-	
+
 	if _, err := exec.LookPath("update-ca-trust"); err == nil {
 		stores = append(stores, "update-ca-trust")
 	}
-	
+
 	return stores
 }

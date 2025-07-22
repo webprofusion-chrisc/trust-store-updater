@@ -4,7 +4,7 @@ import (
 	"crypto/x509"
 	"fmt"
 
-	"github.com/trust-store-updater/internal/certstore"
+	"github.com/webprofusion/trust-store-updater/internal/certstore"
 )
 
 // ApplicationStore implements certificate store operations for macOS application stores

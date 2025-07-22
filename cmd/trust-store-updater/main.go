@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/trust-store-updater/internal/cmd"
+	"github.com/webprofusion/trust-store-updater/internal/cmd"
 )
 
 func main() {

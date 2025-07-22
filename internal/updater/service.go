@@ -6,19 +6,19 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/trust-store-updater/internal/cert"
-	"github.com/trust-store-updater/internal/certstore"
-	"github.com/trust-store-updater/internal/config"
-	"github.com/trust-store-updater/internal/platform"
+	"github.com/webprofusion/trust-store-updater/internal/cert"
+	"github.com/webprofusion/trust-store-updater/internal/certstore"
+	"github.com/webprofusion/trust-store-updater/internal/config"
+	"github.com/webprofusion/trust-store-updater/internal/platform"
 )
 
 // Service handles the certificate trust store update process
 type Service struct {
-	config      *config.Config
+	config       *config.Config
 	storeManager *certstore.StoreManager
-	fetcher     *cert.Fetcher
-	verbose     bool
-	dryRun      bool
+	fetcher      *cert.Fetcher
+	verbose      bool
+	dryRun       bool
 }
 
 // New creates a new updater service
@@ -248,7 +248,7 @@ func (s *Service) updateStore(name string, store certstore.CertificateStore, all
 	// Add new certificates
 	for _, certToAdd := range toAdd {
 		if err := store.AddCertificate(certToAdd.X509Cert); err != nil {
-			fmt.Printf("Warning: Failed to add certificate %s to store %s: %v\n", 
+			fmt.Printf("Warning: Failed to add certificate %s to store %s: %v\n",
 				certToAdd.X509Cert.Subject.CommonName, name, err)
 		} else if s.verbose {
 			fmt.Printf("Added certificate: %s\n", certToAdd.X509Cert.Subject.CommonName)

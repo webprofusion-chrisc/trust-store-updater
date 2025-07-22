@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/trust-store-updater/internal/certstore"
+	"github.com/webprofusion/trust-store-updater/internal/certstore"
 )
 
 // SystemStore implements certificate store operations for macOS system stores
@@ -209,10 +209,10 @@ func (s *SystemStore) restoreLoginKeychain(backupPath string) error {
 // SupportedStores returns the list of supported stores for macOS
 func SupportedStores() []string {
 	var stores []string
-	
+
 	if _, err := exec.LookPath("security"); err == nil {
 		stores = append(stores, "system-keychain", "login-keychain")
 	}
-	
+
 	return stores
 }

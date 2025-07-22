@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/trust-store-updater/internal/certstore"
-	"github.com/trust-store-updater/internal/platform/darwin"
-	"github.com/trust-store-updater/internal/platform/linux"
-	"github.com/trust-store-updater/internal/platform/windows"
+	"github.com/webprofusion/trust-store-updater/internal/certstore"
+	"github.com/webprofusion/trust-store-updater/internal/platform/darwin"
+	"github.com/webprofusion/trust-store-updater/internal/platform/linux"
+	"github.com/webprofusion/trust-store-updater/internal/platform/windows"
 )
 
 // Factory creates platform-specific certificate stores

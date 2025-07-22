@@ -4,7 +4,7 @@ import (
 	"crypto/x509"
 	"fmt"
 
-	"github.com/trust-store-updater/internal/certstore"
+	"github.com/webprofusion/trust-store-updater/internal/certstore"
 )
 
 // SystemStore implements certificate store operations for Windows system stores
