@@ -3,6 +3,7 @@ package linux
 import (
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/pem"
 	"fmt"
 	"os"
 	"os/exec"
@@ -155,16 +156,105 @@ func (s *SystemStore) hasUpdateCaTrust() bool {
 	return err == nil
 }
 
+// listCaCertificatesFromDir lists all certificates from the specified directory (for testability)
+func listCaCertificatesFromDir(certDir string) ([]*x509.Certificate, error) {
+	files, err := os.ReadDir(certDir)
+	if err != nil {
+		certstore.LogErrorf("Failed to read cert dir: %v", err)
+		return nil, fmt.Errorf("failed to read cert dir: %w", err)
+	}
+
+	var certs []*x509.Certificate
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+		name := file.Name()
+		if !(strings.HasSuffix(name, ".crt") || strings.HasSuffix(name, ".pem")) {
+			continue
+		}
+		path := filepath.Join(certDir, name)
+		data, err := os.ReadFile(path)
+		if err != nil {
+			certstore.LogWarnf("Skipping unreadable file: %s (%v)", path, err)
+			continue // skip unreadable files
+		}
+		// Parse all PEM blocks in the file
+		rest := data
+		for {
+			var block *pem.Block
+			block, rest = pem.Decode(rest)
+			if block == nil {
+				break
+			}
+			if block.Type == "CERTIFICATE" {
+				cert, err := x509.ParseCertificate(block.Bytes)
+				if err == nil {
+					certs = append(certs, cert)
+				} else {
+					certstore.LogWarnf("Failed to parse certificate in %s: %v", path, err)
+				}
+			}
+		}
+	}
+	certstore.LogInfof("Found %d certificates in %s", len(certs), certDir)
+	if len(certs) == 0 {
+		return nil, fmt.Errorf("no certificates found in %s", certDir)
+	}
+	return certs, nil
+}
+
 func (s *SystemStore) listCaCertificates() ([]*x509.Certificate, error) {
-	// Implementation for listing ca-certificates
-	// This would parse certificates from /etc/ssl/certs/ or similar
-	return nil, fmt.Errorf("not implemented")
+	return listCaCertificatesFromDir("/etc/ssl/certs/")
 }
 
 func (s *SystemStore) listUpdateCaTrustCertificates() ([]*x509.Certificate, error) {
-	// Implementation for listing update-ca-trust certificates
-	// This would parse certificates from /etc/pki/ca-trust/source/anchors/ or similar
-	return nil, fmt.Errorf("not implemented")
+	// List all .pem/.crt files in /etc/pki/ca-trust/source/anchors/
+	certDir := "/etc/pki/ca-trust/source/anchors/"
+	files, err := os.ReadDir(certDir)
+	if err != nil {
+		certstore.LogErrorf("Failed to read anchors dir: %v", err)
+		return nil, fmt.Errorf("failed to read anchors dir: %w", err)
+	}
+
+	var certs []*x509.Certificate
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+		name := file.Name()
+		if !(strings.HasSuffix(name, ".crt") || strings.HasSuffix(name, ".pem")) {
+			continue
+		}
+		path := filepath.Join(certDir, name)
+		data, err := os.ReadFile(path)
+		if err != nil {
+			certstore.LogWarnf("Skipping unreadable file: %s (%v)", path, err)
+			continue // skip unreadable files
+		}
+		// Parse all PEM blocks in the file
+		rest := data
+		for {
+			var block *pem.Block
+			block, rest = pem.Decode(rest)
+			if block == nil {
+				break
+			}
+			if block.Type == "CERTIFICATE" {
+				cert, err := x509.ParseCertificate(block.Bytes)
+				if err == nil {
+					certs = append(certs, cert)
+				} else {
+					certstore.LogWarnf("Failed to parse certificate in %s: %v", path, err)
+				}
+			}
+		}
+	}
+	certstore.LogInfof("Found %d certificates in %s", len(certs), certDir)
+	if len(certs) == 0 {
+		return nil, fmt.Errorf("no certificates found in %s", certDir)
+	}
+	return certs, nil
 }
 
 func (s *SystemStore) addCaCertificate(cert *x509.Certificate) error {
